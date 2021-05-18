@@ -11,28 +11,71 @@ class TimestampsSeeder extends Seeder
      */
     public function run()
     {
+        // データのクリア
+        DB::table('csv_attendances')->truncate();
+
         //timestampsテーブルにテストデータを登録
-        // $this->call(timestamps_tableSeeder::class);
         $params = [
             'user_id' => '1',
-            'punch_in' => '2020-09-13 08:55:07',
-            'punch_out' => '2020-09-13 18:05:09',
+            'year' => '2021',
+            'month' => '4',
+            'day' => '1',
+            'work_start' => '09:00:00',
+            'work_end' => '18:00:00',
+            'break_time' => '01:00:00',
+            'user_id' => '1',
+            'created_at' => '2021-03-31 09:00:00',
         ];
-        DB::table('timestamp')->insert($params);
-
+        DB::table('csv_attendances')->insert($params);
         $params = [
             'user_id' => '2',
-            'punch_in' => '2020-09-13 08:49:10',
-            'punch_out' => '2020-09-13 18:10:09',
+            'year' => '2021',
+            'month' => '4',
+            'day' => '1',
+            'work_start' => '09:00:00',
+            'work_end' => '18:00:00',
+            'break_time' => '01:00:00',
+            'user_id' => '2',
+            'created_at' => '2021-03-31 09:00:00',
         ];
-        DB::table('timestamp')->insert($params);
-        
+        DB::table('csv_attendances')->insert($params);
         $params = [
             'user_id' => '3',
-            'punch_in' => '2020-09-13 08:53:15',
-            'punch_out' => '2020-09-13 18:20:09',
+            'year' => '2021',
+            'month' => '4',
+            'day' => '1',
+            'work_start' => '09:00:00',
+            'work_end' => '18:00:00',
+            'break_time' => '01:00:00',
+            'user_id' => '3',
+            'created_at' => '2021-03-31 09:00:00',
         ];
-        DB::table('timestamp')->insert($params);
+        DB::table('csv_attendances')->insert($params);
+        $params = [
+            'user_id' => '4',
+            'year' => '2021',
+            'month' => '4',
+            'day' => '1',
+            'work_start' => '09:00:00',
+            'work_end' => '18:00:00',
+            'break_time' => '01:00:00',
+            'user_id' => '4',
+            'created_at' => '2021-03-31 09:00:00',
+        ];
+        DB::table('csv_attendances')->insert($params);
+        $params = [
+            'user_id' => '5',
+            'year' => '2021',
+            'month' => '4',
+            'day' => '1',
+            'work_start' => '09:00:00',
+            'work_end' => '18:00:00',
+            'break_time' => '01:00:00',
+            'user_id' => '5',
+            'created_at' => '2021-03-31 09:00:00',
+        ];
+        DB::table('csv_attendances')->insert($params);
+
     }
     
 }

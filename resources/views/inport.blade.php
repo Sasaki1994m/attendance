@@ -8,25 +8,22 @@
     </div>
 @endif
 <div class="container">
-            <div class="content">
-    
-                <div class="title">Bookingcurve</div>
- 
+            <div class="content m-4 mb-auto">
+                <div class="title"></div>
                 <h4>CSVファイルを選択してください</h4>
                 <div class="row">
                     <div class="col-md-6">
                     </div>
                 </div>
-                
                 <form role="form" method="POST" action="" enctype="multipart/form-data">
                     {{ csrf_field() }}
                     <input type="file" name="csv_file" id="csv_file">
                     <div class="form-group">
-                        <button type="submit" class="btn btn-default btn-success">保存</button>
+                        <br>
+                        <button type="submit" class="btn btn-default btn-success">登録</button>
+                        <button type="button" onclick="history.back()" class="btn btn-info" >戻る</button>
                     </div>
-                </form>
-
- 
+                </form> 
             </div>
-        </div>
+</div>
 @endsection
