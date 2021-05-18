@@ -16,13 +16,13 @@ class CreateCsvAttendancesTable extends Migration
         Schema::create('csv_attendances', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('year');
-            $table->integer('mouth');
+            $table->integer('month');
             $table->integer('day');
-            $table->time('work_start')->format('HH:MM');
-            $table->time('work_end')->format('HH:MM');
-            $table->time('break_time')->format('HH:MM');
+            $table->time('work_start')->nullable()->format('HH:MM:SS');
+            $table->time('work_end')->nullable()->format('HH:MM:SS');
+            $table->time('break_time')->nullable()->format('HH:MM:SS');
             $table->integer('user_id');
-            $table->datetime('punch_in');
+            $table->datetime('punch_in')->nullable();
             $table->datetime('punch_out')->nullable();
             $table->timestamps();
         });

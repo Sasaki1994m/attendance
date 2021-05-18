@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Support\Facades\Auth; /*追加*/
+use Illuminate\Http\Request; // 追加
 
 class LoginController extends Controller
 {
@@ -20,7 +21,9 @@ class LoginController extends Controller
     |
     */
 
-    use AuthenticatesUsers;
+    use AuthenticatesUsers{
+        logout as performLogout;
+    }
 
     /**
      * Where to redirect users after login.
@@ -37,7 +40,6 @@ class LoginController extends Controller
     //     }
     //     return Route::get('/home', ['user' => Auth::id()]);
     // }
-
     /**
      * Create a new controller instance.
      *
@@ -51,6 +53,14 @@ class LoginController extends Controller
     public function login_id()
     {
         return 'login_id';
+    }
+
+    // ログアウト時の挙動を記述
+    public function logout(Request $request)
+    {
+        $this->performLogout($request);
+        // フラッシュメッセージを表示
+        return redirect('/home')->with('flash_message', __('ログアウトしました'));
     }
 
 }

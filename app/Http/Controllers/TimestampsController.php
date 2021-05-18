@@ -14,11 +14,17 @@ use Carbon\Carbon;
 class TimestampsController extends Controller
 {
     public function list(){
+        $daytime = Carbon::now();
+        $year  = $daytime->year ;
+        $month = $daytime->month;
+        $day = $daytime->day;
 
-        $timestamp = CsvAttendance::get();  
-        
+        $today = CsvAttendance::query();
+        $today->where('year', $year); 
+        $today->where('month', $month); 
+        $today->where('day', $day); 
+        $timestamp = $today->paginate();
         return view('list',['timestamp' => $timestamp]);
-    
     }
 
     public function create(){
@@ -26,64 +32,117 @@ class TimestampsController extends Controller
         return view('create');
     }
 
-    public function store(Request $request){
+    public function store(Request $request, $id)
+    {
+        $daytime = Carbon::now();
+        $year  = $daytime->year ;
+        $month = $daytime->month;
+        $day = $daytime->day;
+        $before = ($day)-1; //前日
 
-        $today = Carbon::today();
-        $old_today = DB::table('csv_attendances')
-            ->where('user_id', \Auth::user()->id)->latest()->first();
-            // dd($old_today);
-        // if ($old_today) {
-        //     $oldTimestampPunchIn = new Carbon($old_today->punch_in);
-        //     $oldTimestampDay = $oldTimestampPunchIn->startOfDay();
-        // }
-        // if(($today == $oldTimestampDay) || empty($old_today->punch_out)){
-        //     return back()->with('status','今日の登録は完了しているかすでに出勤打刻がされています');
-        // }
+        //昨日が退勤打刻されているか判定
+        $yesterday = DB::table('csv_attendances')->where([
+            ['user_id', '=', $id],
+            ['year', '=', $year],
+            ['month', '=', $month],
+            ['day', '=', $before]
+            ])->get();
+
+        foreach($yesterday as $value_data){
+            $data =  [
+                $value_data->work_start,
+                $value_data->punch_in,
+                $value_data->punch_out,
+            ];
+        }
+        if($data[0] != null && $data[1] != null && $data[2] === null ){
+            return back()->with('error','退勤打刻がされていません。');
+        }
+
+        //本日が出勤日なのか、打刻済みでないか判定
+        $result = DB::table('csv_attendances')->where([
+            ['user_id', '=', $id],
+            ['year', '=', $year],
+            ['month', '=', $month],
+            ['day', '=', $day]
+            ])->get();
+
+            foreach($result as $value){
+                $data =  [
+                    $value->work_start,
+                    $value->punch_in,
+                ];
+            }
+            if($data[0] === null){
+                return back()->with('error','本日は出勤日ではありません。');
+            }elseif($data[1] != null){
+                return back()->with('error','既に出勤打刻済みです。');
+            }
+        \DB::beginTransaction();
         try{
-            $timestamp = new CsvAttendance;
-            // $timestamp->user_id = \Auth::user()->id;
-            $timestamp->punch_in = Carbon::now();
-            $timestamp->timestamps = false;
-            $timestamp->save();
-            dd($timestamp);
-
+            $timestamp = DB::table('csv_attendances')->where([
+                            ['user_id', '=', $id],
+                            ['year', '=', $year],
+                            ['month', '=', $month],
+                            ['day', '=', $day]
+                            ])
+                        ->update(['punch_in' => Carbon::now() ]);
             \DB::commit();
-
-            return redirect(route('list'));
+            return redirect(route('mypage.index',[ 'id' => $id]))->with('status','出勤打刻が完了しました。');
 		} catch (\Exception $e) {
 			// エラー発生時は、DBへの保存処理が無かったことにする（ロールバック）
 			\DB::rollBack();
-			throw $e;
+            return back()->with('status','出勤打刻に失敗しました。');
         }
         
     }
 
-    public function update(Request $request){
+    public function update(Request $request, $id)
+    {
 
-        $done_punchout = DB::table('csv_attendances')
-        ->where('user_id', \Auth::user()->id)->latest()->first();
-        if(!empty($done_punchout->punch_out)){
-            return back()->with('status','既に退勤打刻がされています。');
+        $daytime = Carbon::now();
+        $year  = $daytime->year ;
+        $month = $daytime->month;
+        $day = $daytime->day;
+
+        //今日が出勤日か、出勤打刻がされているか、既に退勤打刻されているか判定
+        $today = DB::table('csv_attendances')->where([
+            ['user_id', '=', $id],
+            ['year', '=', $year],
+            ['month', '=', $month],
+            ['day', '=', $day]
+            ])->get();
+
+        foreach($today as $value_data_2){
+            $data =  [
+                $value_data_2->work_start,
+                $value_data_2->punch_in,
+                $value_data_2->punch_out,
+            ];
         }
+        if($data[0] === null){
+            return back()->with('error','本日は出勤日ではありません。');
+        }elseif($data[0] != null && $data[1] === null ){
+            return back()->with('error','出勤打刻がされていません。');
+        }elseif($data[2] != null){
+            return back()->with('error','既に退勤打刻済みです。');
+        }
+        // 更新処理
+        \DB::beginTransaction();
         try{
-            $timestamp = DB::table('csv_attendances')
-              ->where('user_id', \Auth::user()->id)
-              ->update(['punch_out' => Carbon::now()
-                        ]);
-
-            //下記でもUPDATE処理を書ける
-            // $timestamp->user_id = \Auth::user()->id;
-            // $timestamp = Timestamp::where('user_id',Auth::user()->id);
-            // $timestamp->punch_in = Carbon::now();
-            // $timestamp->save();
-            // -------------------------------
+            $timestamp2 = DB::table('csv_attendances')->where([
+                            ['user_id', '=', $id],
+                            ['year', '=', $year],
+                            ['month', '=', $month],
+                            ['day', '=', $day]
+                            ])
+                        ->update(['punch_out' => Carbon::now() ]);
             \DB::commit();
-
-            return redirect(route('list'));
+            return redirect(route('mypage.index',[ 'id' => $id]))->with('status','出勤打刻が完了しました。');
 		} catch (\Exception $e) {
 			// エラー発生時は、DBへの保存処理が無かったことにする（ロールバック）
 			\DB::rollBack();
-			throw $e;
+            return back()->with('status','退勤打刻に失敗しました。');
         }
         
     }

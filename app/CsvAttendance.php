@@ -8,7 +8,7 @@ class CsvAttendance extends Model
 {
 
     protected $fillable = [
-        'year', 'mouth', 'day',
+        'year', 'month', 'day',
         'work_start', 'work_end', 'break_time',
         'user_id', 'punch_in', 'punch_out'
     ];

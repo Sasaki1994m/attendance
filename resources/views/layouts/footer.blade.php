@@ -1,9 +1,9 @@
 <footer>
   <div class="footer bg-dark">
     <div class="footer_items">
-      <p class="text-white text-center">
+      <h6 class="text-white mx-auto">
         &copy;makoto-sasaki All rights reserved
-      </p>
+      </h6>
     </div>
   </div>
 </footer>
