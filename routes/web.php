@@ -11,9 +11,12 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// Route::get('/', function () {
+//     return view('welcome');
+// });
+Route::get('/{any}', function () {
+    return view('app');
+})->where('any', '.*');
 
 //ログイン関連のルーティング
 Auth::routes([
