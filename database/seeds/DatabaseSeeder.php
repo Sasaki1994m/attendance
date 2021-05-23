@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
             
             UsersTableSeeder::class,
             TimestampsSeeder::class,
+            TasksTableSeeder::class,
         ]);
 
     }
